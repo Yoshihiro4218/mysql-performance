@@ -31,7 +31,7 @@ Query OK, 524288 rows affected (19.93 sec)
 Records: 524288  Duplicates: 0  Warnings: 0
 ```
 
-## 100万レコード UPDATE
+## 100万 全レコード UPDATE
 ### インデックスなし
 ```
 mysql> UPDATE item
