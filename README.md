@@ -1,2 +1,7 @@
-# mysql-performance
-mysql-performance
+# MySQL でのパフォーマンス測定
+## MEMO
+
+- インデックスの有無での SELECT, INSERT, 文字列や数値
+- インデックスを無駄に大量に貼ったとき
+- 絞り込みのタイミング
+- 
