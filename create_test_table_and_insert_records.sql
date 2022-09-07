@@ -34,7 +34,7 @@ SET str  = SUBSTRING(MD5(RAND()), 1, 30),
     str3 = SUBSTRING(MD5(RAND()), 1, 30);
 
 # 無駄に index あり
-CREATE TABLE item_index
+CREATE TABLE item_index_2
 (
     id   INT PRIMARY KEY AUTO_INCREMENT,
     str  VARCHAR(30),
