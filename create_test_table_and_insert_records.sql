@@ -1,3 +1,4 @@
+################################################
 # index なし
 CREATE TABLE item
 (
@@ -18,6 +19,7 @@ SET str  = SUBSTRING(MD5(RAND()), 1, 30),
     str2 = SUBSTRING(MD5(RAND()), 1, 30),
     str3 = SUBSTRING(MD5(RAND()), 1, 30);
 
+################################################
 # index あり
 CREATE TABLE item_index
 (
@@ -28,11 +30,18 @@ CREATE TABLE item_index
     index (str)
 );
 
-UPDATE item
+INSERT INTO item_index () VALUES ();
+INSERT INTO item_index (id) SELECT 0 FROM item_index;
+INSERT INTO item_index (id) SELECT 0 FROM item_index;
+INSERT INTO item_index (id) SELECT 0 FROM item_index;
+INSERT INTO item_index (id) SELECT 0 FROM item_index;
+
+UPDATE item_index
 SET str  = SUBSTRING(MD5(RAND()), 1, 30),
     str2 = SUBSTRING(MD5(RAND()), 1, 30),
     str3 = SUBSTRING(MD5(RAND()), 1, 30);
 
+################################################
 # 無駄に index あり
 CREATE TABLE item_index_2
 (
@@ -53,9 +62,13 @@ CREATE TABLE item_index_2
     index (str3, str2, str)
 );
 
-UPDATE item
+UPDATE item_index_2
 SET str  = SUBSTRING(MD5(RAND()), 1, 30),
     str2 = SUBSTRING(MD5(RAND()), 1, 30),
     str3 = SUBSTRING(MD5(RAND()), 1, 30);
 
-#DELETE FROM item;
+INSERT INTO item_index_2 () VALUES ();
+INSERT INTO item_index_2 (id) SELECT 0 FROM item_index_2;
+INSERT INTO item_index_2 (id) SELECT 0 FROM item_index_2;
+INSERT INTO item_index_2 (id) SELECT 0 FROM item_index_2;
+INSERT INTO item_index_2 (id) SELECT 0 FROM item_index_2;
