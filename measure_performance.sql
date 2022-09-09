@@ -8,8 +8,9 @@ UPDATE performance_schema.setup_instruments SET ENABLED = 'YES', TIMED = 'YES' W
 UPDATE performance_schema.setup_instruments SET ENABLED = 'YES', TIMED = 'YES' WHERE NAME LIKE '%stage/%';
 
 # 測定
+# noinspection SqlResolve
 SELECT EVENT_ID,
        TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
        SQL_TEXT
 FROM performance_schema.events_statements_history_long
-WHERE SQL_TEXT = 'select * from item';
+WHERE SQL_TEXT = "select * from item_index where str2 like '2525%'";
