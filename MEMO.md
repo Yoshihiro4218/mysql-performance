@@ -1,13 +1,12 @@
-# MEMO
-## やろうかと思っていること
+# やろうかと思っていること
 - インデックスの有無での SELECT, INSERT, 文字列や数値
 - インデックスを無駄に大量に貼ったとき
 - 絞り込みのタイミング
 - あとで index を貼る時間(レコード数ごと)
 
 
-## ログのメモ
-### index なしの INSERT
+# ログのメモ
+## index なしの INSERT
 ```
 mysql> INSERT INTO item (id) SELECT 0 FROM item;
 Query OK, 1024 rows affected (0.02 sec)
@@ -44,9 +43,13 @@ Records: 131072  Duplicates: 0  Warnings: 0
 mysql> INSERT INTO item (id) SELECT 0 FROM item;
 Query OK, 262144 rows affected (2.54 sec)
 Records: 262144  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO item (id) SELECT 0 FROM item;
+Query OK, 524288 rows affected (5.07 sec)
+Records: 524288  Duplicates: 0  Warnings: 0
 ```
 
-### index ありの INSERT
+## index ありの INSERT
 ```
 mysql> INSERT INTO item_index (id) SELECT 0 FROM item_index;
 Query OK, 1024 rows affected (0.05 sec)
@@ -84,9 +87,12 @@ mysql> INSERT INTO item_index (id) SELECT 0 FROM item_index;
 Query OK, 262144 rows affected (4.08 sec)
 Records: 262144  Duplicates: 0  Warnings: 0
 
+mysql> INSERT INTO item_index (id) SELECT 0 FROM item_index;
+Query OK, 524288 rows affected (7.73 sec)
+Records: 524288  Duplicates: 0  Warnings: 0
 ```
 
-### 無駄な index ありの INSERT
+## 無駄な index ありの INSERT
 ```
 mysql> INSERT INTO item_index_2 (id) SELECT 0 FROM item_index_2;
 Query OK, 1024 rows affected (0.12 sec)
@@ -123,9 +129,51 @@ Records: 131072  Duplicates: 0  Warnings: 0
 mysql> INSERT INTO item_index_2 (id) SELECT 0 FROM item_index_2;
 Query OK, 262144 rows affected (10.29 sec)
 Records: 262144  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO item_index_2 (id) SELECT 0 FROM item_index_2;
+Query OK, 524288 rows affected (19.93 sec)
+Records: 524288  Duplicates: 0  Warnings: 0
 ```
 
-## SELECT (like 前方一致)
+## 100万 全レコード UPDATE
+### インデックスなし
+```
+mysql> UPDATE item
+    -> SET num  = CEIL(RAND() * 100000000),
+    ->     str  = SUBSTRING(MD5(RAND()), 1, 30),
+    ->     str2 = SUBSTRING(MD5(RAND()), 1, 30),
+    ->     str3 = SUBSTRING(MD5(RAND()), 1, 30);
+
+Query OK, 1048576 rows affected (22.64 sec)
+Rows matched: 1048576  Changed: 1048576  Warnings: 0
+```
+
+### インデックスあり
+```
+mysql> UPDATE item_index
+    -> SET num  = CEIL(RAND() * 100000000),
+    ->     str  = SUBSTRING(MD5(RAND()), 1, 30),
+    ->     str2 = SUBSTRING(MD5(RAND()), 1, 30),
+    ->     str3 = SUBSTRING(MD5(RAND()), 1, 30);
+
+Query OK, 1048576 rows affected (2 min 2.74 sec)
+Rows matched: 1048576  Changed: 1048576  Warnings: 0
+```
+
+### 無駄にインデックスあり
+```
+mysql> UPDATE item_index_2
+    -> SET num  = CEIL(RAND() * 100000000),
+    ->     str  = SUBSTRING(MD5(RAND()), 1, 30),
+    ->     str2 = SUBSTRING(MD5(RAND()), 1, 30),
+    ->     str3 = SUBSTRING(MD5(RAND()), 1, 30);
+
+Query OK, 1048576 rows affected (30 min 19.58 sec)
+Rows matched: 1048576  Changed: 1048576  Warnings: 0
+```
+
+## SELECT (like 前方一致: index なしとあり)
+
 ```
 mysql> explain select * from item_index where str like '2525%';
 +----+-------------+------------+------------+-------+---------------+------+---------+------+------+----------+-----------------------+
@@ -216,5 +264,105 @@ mysql> SELECT EVENT_ID,
 1 row in set (0.00 sec)
 ```
 
+## SELECT (like 前方一致: index 1つと2つ(複合))
+```
+mysql> explain select * from item_index where str like '25%' and str2 like '25%';
++----+-------------+------------+------------+-------+---------------+------+---------+------+------+----------+------------------------------------+
+| id | select_type | table      | partitions | type  | possible_keys | key  | key_len | ref  | rows | filtered | Extra                              |
++----+-------------+------------+------------+-------+---------------+------+---------+------+------+----------+------------------------------------+
+|  1 | SIMPLE      | item_index | NULL       | range | str           | str  | 123     | NULL | 6976 |    11.11 | Using index condition; Using where |
++----+-------------+------------+------------+-------+---------------+------+---------+------+------+----------+------------------------------------+
+1 row in set, 1 warning (0.00 sec)
+
+mysql> explain select * from item_index_2 where str like '25%' and str2 like '25%';
++----+-------------+--------------+------------+-------+-------------------------------------------------------+--------+---------+------+------+----------+----------------------------------+
+| id | select_type | table        | partitions | type  | possible_keys                                         | key    | key_len | ref  | rows | filtered | Extra                            |
++----+-------------+--------------+------------+-------+-------------------------------------------------------+--------+---------+------+------+----------+----------------------------------+
+|  1 | SIMPLE      | item_index_2 | NULL       | range | str,str2,str_2,str_3,str2_2,str_4,str_5,str2_3,str2_4 | str2_4 | 123     | NULL | 6668 |     0.65 | Using index condition; Using MRR |
++----+-------------+--------------+------------+-------+-------------------------------------------------------+--------+---------+------+------+----------+----------------------------------+
+1 row in set, 1 warning (0.02 sec)
+
+mysql> select * from item_index where str like '25%' and str2 like '25%';
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+| id      | num      | str                            | str2                           | str3                           |
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+|  558933 | 41848411 | 252b335a3d67a5421589e69503a5a8 | 2552e13c8a102817a88652b6ec08b6 | d7c49ffb3ffb1f354e3087539b0926 |
+|  392194 | 98744725 | 2539b6215404ee6a2733de0da46e96 | 2580de8cd7a266e53373bfffc877ed | 848bcce17651d061bba61debc3c673 |
+| 1102172 | 55926101 | 25427cf1fbe33639df19ab0f2502ea | 25d4e012d06af1873512b61b3a3c81 | 3309f461f6ff26d3abd9f57910b5d4 |
+| 1152888 | 51031297 | 254d6a602044a569f391bbef7cb45b | 2549cea80daad9ffaef99ddd93548d | d220451d9c9cc007ef7b4b2a72f5ff |
+|  149605 | 81996400 | 255376208d858a7b75629b30a570a0 | 250c4ccdb4b7ca5e0ae1a9ca054526 | 705a58852a712ae1bc850b6987e924 |
+|  921197 | 29528816 | 255ac3b37d65a893becaedfc65f6e7 | 256cd8822aff12b7da7d743067f5bc | c44ff9aa04a3ba4f3702bbd75fbaa8 |
+| 1045154 | 72887137 | 2587ead7dea24eb2d2e1227d731110 | 25a3748e245e804c1b53101f52c927 | f651154b540b7f37ed8a8dc9a1b19d |
+|  620445 | 83847591 | 2596768d33e859aed7c328b4d3bea4 | 2579badacf33740a1870703322b399 | 9ee8488c32fd50e3f3d041194d1ab7 |
+| 1181850 | 71474024 | 25a410cf2afe18ca94181b47b851a7 | 25a3dd4ee1ff7038a08f2570aaf3be | d2c720c734560cc879e25b0784908b |
+|   39812 | 41225470 | 25c8d48b26bd097e0c272a51bc1c6c | 2547d5c3f67636ce3de5cc8fd388c2 | c43c065eb0f189ccb2f82bf206c161 |
+|  863844 | 14074028 | 25cbb64304c85c685614f0d8a66bd2 | 25e27fa1bcb089aa1ac96907cad499 | 858a52a6f4c3b3c0879ec727b15597 |
+| 1034419 | 71995222 | 25ce037abd1453600dc9149c4f1e69 | 251c77ec65aca169431529969c28c7 | 79ee18c8219f2605fca6d15a2d84eb |
+| 1027083 | 44198037 | 25e1f4b5ecc8c06010301d24bda849 | 25ccdce24e904c70e2580bdacbe127 | bbd90c2756e8a04fc2504848c5ecbb |
+| 1164571 | 96485890 | 25e3e56d031a03d91c9582f620fc6a | 25b6f8151c74010f7b5412392f184a | 7e3536c3a0e6f77ec98396447a5e08 |
+|   95749 | 84850061 | 25ea50f2ca9d8a09a74e8dd43c1165 | 254d42d6f00ab613b6973036789cac | 7d7418851ea8bd6cfe16ea21c769b2 |
+|  477598 | 66972009 | 25eadf63559eb8f74b45f9e6f4accd | 25e684528906dc7b647344a417e2b8 | c8a8396b15faa1400095c46504564c |
+| 1258707 |  8628585 | 25f350c0e7769184e1f20524f8000a | 25d656409ebd8f4b3293853bbe0b5e | 805bd6f97d1f3bba6ce1029963306d |
+| 1111399 | 39939816 | 25fc73745aca46e693283bd7eea936 | 2587ecdd8f264e993ba38aab940b27 | 9af54e8ba252345eaf5ffe6e0c2cd4 |
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+18 rows in set (0.03 sec)
+
+mysql> select * from item_index_2 where str like '25%' and str2 like '25%';
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+| id      | num      | str                            | str2                           | str3                           |
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+|   81331 | 98608772 | 25ee115c8ffe887de731f9f702c7c3 | 25c40eff5a34a8d9930e1b0c668943 | f86fd73ad16be779fd6f928a7b90c1 |
+|  358921 |  1003437 | 25ea80089ca00d996776ba04787c20 | 25a7fb87bf9ace00af5aec5cc2ff30 | f83527b8ad5ffb16bbc931a64eed98 |
+|  361693 | 25104443 | 25cfd853fbbb7dcc24f4b4e2213fb9 | 25bdecce294439c79a2909956c2854 | 99ae15f3f2857137ea0f8e98d56b06 |
+|  600058 | 76627935 | 25eff0890bc616f18723c2d820dba1 | 25553fb8e7ff774cd98d2ac25e59fb | ca5f9d5b26575c145656092a543678 |
+|  605915 | 98193351 | 25aaa270ae97e200f71dac8be884ce | 253db2f9a79d0c20f96a4fa0ee4fab | 04c8913d87369894ffd346e4e98431 |
+|  618734 | 47068877 | 25bb26cdc27bca206a649380444d51 | 256fe1195040020b98476b0f588c0c | dcf45bcee8333e8aa4face7286d56b |
+|  632376 |  2645473 | 254728b0f7ecb4fcd2803c4dc0a0a4 | 25ea9e6556b010b039424b4508ba9d | 05fbd4a9903db7f9290c447d2558fe |
+|  693763 | 45502006 | 25359af5829b040e932348425b898b | 25150a55cc237c958493224502d7d5 | 99a742df60fe73504e72bec3d943f7 |
+|  811357 |  5197846 | 250440ed0676bdf31038a6b8ddddb2 | 251d878cabc92a9081268fe0c0f4e3 | 4a053f07caf36516afa455f5a5a5a9 |
+|  859925 | 16364649 | 2514dde1b63bf02db79f5c43af5ee9 | 25edcd3fde30ab0acc9bca527e6da1 | 64b9394aa1d6a34a41d04ceb2dd536 |
+|  905759 |  6301185 | 25faed9bef2277630dfe76b3e9ce35 | 257a2a1d0cc3eed1f1194cad59f21b | 7ec011e6a27af0856db1f95c77c439 |
+|  918138 | 27146134 | 25ea50f2ca9d8a09a74e8dd43c1165 | 25479ee47e348d13a9611df3615e78 | ed1a38bb06d58fb638b762f4aeffee |
+|  941698 | 66494707 | 2509f719f55987b011d585b671abad | 25828d440ffac95c9f4feaeb69088a | 044e7fee369124e4ee99d28e9455c3 |
+|  952144 | 15362288 | 251ffda4bb28246c7f2ceb905b8968 | 2585a26bd31003e660dba9ac107ea5 | 30c217f49c195f6d130dbeed184c93 |
+|  954333 | 62124301 | 2506ea3aefd578dd39c9b56a55db40 | 258f6b12a6c69d1f1be8fdd75d6e94 | a366f0fa41ea0a78bbf0aabd957dec |
+|  956050 | 18517502 | 25ebd7eeefccb25e99ad1d3a4d2960 | 25f949f63d18389f0eb56e39c12072 | 466348504010a779d3da53daf5b4ec |
+| 1001036 | 28224953 | 2553c66f77644ab94ffc675836f815 | 2551d445cf84a85e4eb66a43538d2c | f18860db297f604bc4a7e4ffccad97 |
+| 1230378 | 29364977 | 251b264ed7d2d298e22ffea7c39e84 | 25de3ebf62df3f117b4f2b48ad69b8 | 9786eef6524c1c1412d2d8104cccc6 |
+| 1269066 | 32669699 | 257131ed527bb3c706e9a81583461c | 25de7308e29625ece62d35ee667b1f | 9d0cd5593c498427bb191fb2572725 |
+| 1303206 | 13605809 | 2534ab653f59c91b952f427f9a365b | 258d695fc70bdc736443843ea8571c | 42d2e9954e4ae24aef40d4789f43ec |
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+20 rows in set (0.02 sec)
+```
+
+```
+mysql> SELECT EVENT_ID,
+    ->        TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
+    ->        SQL_TEXT
+    -> FROM performance_schema.events_statements_history_long
+    -> WHERE SQL_TEXT like 'select%'
+    -> ORDER BY EVENT_ID DESC
+    -> LIMIT 1;
++----------+----------+-------------------------------------------------------------------+
+| EVENT_ID | Duration | SQL_TEXT                                                          |
++----------+----------+-------------------------------------------------------------------+
+|      217 | 0.025093 | select * from item_index where str like '25%' and str2 like '25%' |
++----------+----------+-------------------------------------------------------------------+
+1 row in set (0.01 sec)
+
+mysql> SELECT EVENT_ID,
+    ->        TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
+    ->        SQL_TEXT
+    -> FROM performance_schema.events_statements_history_long
+    -> WHERE SQL_TEXT like 'select%'
+    -> ORDER BY EVENT_ID DESC
+    -> LIMIT 1;
++----------+----------+---------------------------------------------------------------------+
+| EVENT_ID | Duration | SQL_TEXT                                                            |
++----------+----------+---------------------------------------------------------------------+
+|      236 | 0.018423 | select * from item_index_2 where str like '25%' and str2 like '25%' |
++----------+----------+---------------------------------------------------------------------+
+1 row in set (0.00 sec)
 
 
+```
