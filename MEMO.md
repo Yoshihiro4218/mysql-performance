@@ -264,8 +264,16 @@ mysql> SELECT EVENT_ID,
 1 row in set (0.00 sec)
 ```
 
-## SELECT (like 前方一致: index 1つと2つ(複合))
+## SELECT (like 前方一致: index なし/1つ/2つ(複合))
 ```
+mysql> explain select * from item where str like '25%' and str2 like '25%';
++----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra       |
++----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+|  1 | SIMPLE      | item  | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 974382 |     1.23 | Using where |
++----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+1 row in set, 1 warning (0.00 sec)
+
 mysql> explain select * from item_index where str like '25%' and str2 like '25%';
 +----+-------------+------------+------------+-------+---------------+------+---------+------+------+----------+------------------------------------+
 | id | select_type | table      | partitions | type  | possible_keys | key  | key_len | ref  | rows | filtered | Extra                              |
@@ -281,6 +289,23 @@ mysql> explain select * from item_index_2 where str like '25%' and str2 like '25
 |  1 | SIMPLE      | item_index_2 | NULL       | range | str,str2,str_2,str_3,str2_2,str_4,str_5,str2_3,str2_4 | str2_4 | 123     | NULL | 6668 |     0.65 | Using index condition; Using MRR |
 +----+-------------+--------------+------------+-------+-------------------------------------------------------+--------+---------+------+------+----------+----------------------------------+
 1 row in set, 1 warning (0.02 sec)
+
+mysql> select * from item where str like '25%' and str2 like '25%';
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+| id      | num      | str                            | str2                           | str3                           |
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+|  153949 | 49774956 | 25d600ac2c7fb8251a476b8d3bea01 | 25d2b1c4f5afae110851df9c9cb648 | b952498c75c34d85499479b0266b0a |
+|  373144 | 20906882 | 2503963b768ab2ebe01f9a0d2aa8eb | 251207092fa644ec3b3cccaf663958 | 0746ba6f5a41bda72f0c647c3ec69c |
+|  539548 | 25948911 | 25246fc80211409af3d4bcdecbb6d5 | 25a7f32ae272f245493275ecee2cb4 | d5ed60e65ef84750f6e000e34ac6b1 |
+|  652618 | 63390992 | 25fcc3300b6cb3ca95e28ce95d3f04 | 25575dbc6620852c174c1254a90907 | 610b88e712b6ea37b70c8ece24de0f |
+|  711712 | 78767158 | 2562900b14f1f728c8a03b7394c567 | 25ebf0d9bb74c46e59b03653b5791f | 0363354a83841fb2dbe64c93210fed |
+|  861367 | 21899693 | 257f26dc34181e954cb1ff115caf7d | 2511c6f2777ba546c1eb46104650c5 | 9d2fe81969d9b6fdf3672b25ec3a60 |
+|  941446 | 13647986 | 25df6f6c01213af3ce498f5982fe3f | 25592c127b51ba7e34381d97bf6563 | eaa3fc271c86de51c699dc96a63c32 |
+|  990901 |  8767633 | 2553199700facaa36d5e442d4d16c4 | 2550a70c0b4c5b4d4ec85f10c97086 | ffa1e4825549aeb7edd333c1ff4dfb |
+| 1077636 | 40475056 | 25b5b94c5d7ea0ecfce09f8da47c90 | 2520804ebe0653c483663f345cde17 | 6972ed7752911b52fd4a0578b3cb6d |
+| 1241963 | 71155402 | 253e0566d242aaaf46f25bf67ff2d8 | 25a9e40a1565cab36565fe50bea6bf | ad98d4cb0223425dc3aa3620c90bc4 |
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+10 rows in set (0.57 sec)
 
 mysql> select * from item_index where str like '25%' and str2 like '25%';
 +---------+----------+--------------------------------+--------------------------------+--------------------------------+
@@ -336,6 +361,19 @@ mysql> select * from item_index_2 where str like '25%' and str2 like '25%';
 ```
 
 ```
+mysql> SELECT EVENT_ID,                                                                                                                                                                                               ->        TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
+    ->        SQL_TEXT
+    -> FROM performance_schema.events_statements_history_long
+    -> WHERE SQL_TEXT like 'select%'
+    -> ORDER BY EVENT_ID DESC
+    -> LIMIT 1;
++----------+----------+-------------------------------------------------------------+
+| EVENT_ID | Duration | SQL_TEXT                                                    |
++----------+----------+-------------------------------------------------------------+
+|      274 | 0.562961 | select * from item where str like '25%' and str2 like '25%' |
++----------+----------+-------------------------------------------------------------+
+1 row in set (0.01 sec)
+
 mysql> SELECT EVENT_ID,
     ->        TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
     ->        SQL_TEXT
