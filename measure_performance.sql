@@ -24,3 +24,18 @@ WHERE SQL_TEXT like 'select%'
 ORDER BY EVENT_ID DESC
 LIMIT 1;
 
+
+SELECT EVENT_ID,
+       TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
+       SQL_TEXT
+FROM performance_schema.events_statements_history_long
+WHERE SQL_TEXT = "select * from item where str like '%2%' and str2 like '%525%'";
+
+
+SELECT EVENT_ID,
+       TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
+       SQL_TEXT
+FROM performance_schema.events_statements_history_long
+WHERE SQL_TEXT = "select * from item where str2 like '%525%' and str like '%2%'";
+
+

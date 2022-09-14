@@ -2,8 +2,12 @@
 - インデックスの有無での SELECT, INSERT, 文字列や数値
 - インデックスを無駄に大量に貼ったとき
 - 絞り込みのタイミング
+- 複合 index 順番しくったら
 - あとで index を貼る時間(レコード数ごと)
 
+# 謎事象メモ
+- limit つけての UPDATE
+  - limit の件数って別の影響ある説？
 
 # ログのメモ
 ## index なしの INSERT
@@ -135,9 +139,17 @@ Query OK, 524288 rows affected (19.93 sec)
 Records: 524288  Duplicates: 0  Warnings: 0
 ```
 
-## 100万 全レコード UPDATE
+## UPDATE
 ### インデックスなし
 ```
+mysql> UPDATE item
+    -> SET num  = CEIL(RAND() * 100000000),
+    ->     str  = SUBSTRING(MD5(RAND()), 1, 30),
+    ->     str2 = SUBSTRING(MD5(RAND()), 1, 30),
+    ->     str3 = SUBSTRING(MD5(RAND()), 1, 30) limit 524288;
+Query OK, 524288 rows affected (6.14 sec)
+Rows matched: 524288  Changed: 524288  Warnings: 0
+
 mysql> UPDATE item
     -> SET num  = CEIL(RAND() * 100000000),
     ->     str  = SUBSTRING(MD5(RAND()), 1, 30),
@@ -162,6 +174,15 @@ Rows matched: 1048576  Changed: 1048576  Warnings: 0
 
 ### 無駄にインデックスあり
 ```
+mysql> UPDATE item_index_2
+    -> SET num  = CEIL(RAND() * 100000000),
+    ->     str  = SUBSTRING(MD5(RAND()), 1, 30),
+    ->     str2 = SUBSTRING(MD5(RAND()), 1, 30),
+    ->     str3 = SUBSTRING(MD5(RAND()), 1, 30) limit 524288;
+
+Query OK, 524288 rows affected (46 min 50.20 sec)
+Rows matched: 524288  Changed: 524288  Warnings: 0
+
 mysql> UPDATE item_index_2
     -> SET num  = CEIL(RAND() * 100000000),
     ->     str  = SUBSTRING(MD5(RAND()), 1, 30),
@@ -585,5 +606,51 @@ mysql> SELECT EVENT_ID,                                                         
 1 row in set (0.00 sec)
 ```
 
+## 絞り込みのタイミング(後方一致でやりなおし)
+### 1条件目で絞り込めてない
+```
+mysql> SELECT EVENT_ID,
+    ->        TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
+    ->        SQL_TEXT
+    -> FROM performance_schema.events_statements_history_long
+    -> WHERE SQL_TEXT = "select * from item where str like '%2%' and str2 like '%525%'";
++----------+----------+---------------------------------------------------------------+
+| EVENT_ID | Duration | SQL_TEXT                                                      |
++----------+----------+---------------------------------------------------------------+
+|      532 | 0.758868 | select * from item where str like '%2%' and str2 like '%525%' |
+|      627 | 0.734291 | select * from item where str like '%2%' and str2 like '%525%' |
+|      646 | 0.731736 | select * from item where str like '%2%' and str2 like '%525%' |
+|      665 | 0.784295 | select * from item where str like '%2%' and str2 like '%525%' |
+|      684 | 0.699200 | select * from item where str like '%2%' and str2 like '%525%' |
+|      817 | 0.726403 | select * from item where str like '%2%' and str2 like '%525%' |
+|      836 | 0.665074 | select * from item where str like '%2%' and str2 like '%525%' |
+|      855 | 0.669399 | select * from item where str like '%2%' and str2 like '%525%' |
+|      874 | 0.718087 | select * from item where str like '%2%' and str2 like '%525%' |
+|      893 | 0.731762 | select * from item where str like '%2%' and str2 like '%525%' |
++----------+----------+---------------------------------------------------------------+
+10 rows in set (0.00 sec)
+```
 
-
+### 1条件目で絞り込めている
+```
+mysql> SELECT EVENT_ID,
+    ->        TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
+    ->        SQL_TEXT
+    -> FROM performance_schema.events_statements_history_long
+    -> WHERE SQL_TEXT = "select * from item where str2 like '%525%' and str like '%2%'";
++----------+----------+---------------------------------------------------------------+
+| EVENT_ID | Duration | SQL_TEXT                                                      |
++----------+----------+---------------------------------------------------------------+
+|      551 | 0.610941 | select * from item where str2 like '%525%' and str like '%2%' |
+|      570 | 0.568627 | select * from item where str2 like '%525%' and str like '%2%' |
+|      589 | 0.619817 | select * from item where str2 like '%525%' and str like '%2%' |
+|      608 | 0.630084 | select * from item where str2 like '%525%' and str like '%2%' |
+|      703 | 0.627935 | select * from item where str2 like '%525%' and str like '%2%' |
+|      722 | 0.613024 | select * from item where str2 like '%525%' and str like '%2%' |
+|      741 | 0.563686 | select * from item where str2 like '%525%' and str like '%2%' |
+|      760 | 0.567389 | select * from item where str2 like '%525%' and str like '%2%' |
+|      779 | 0.595388 | select * from item where str2 like '%525%' and str like '%2%' |
+|      798 | 0.675684 | select * from item where str2 like '%525%' and str like '%2%' |
++----------+----------+---------------------------------------------------------------+
+10 rows in set (0.01 sec)
+```
