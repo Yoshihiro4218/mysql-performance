@@ -1,28 +1,64 @@
 # MySQL でのパフォーマンス測定
-WIP...
+普段パフォーマンスを気にしながらインデックスを貼ったりクエリを投げているわけですが、無頓着だとどれくらい差がでるのか気になったので計測してみます。
 
 # 計測
-## 50万 NULL レコード INSERT
-### インデックスなし
+## INSERT
+### テーブル
+#### index なし
 ```
-mysql> INSERT INTO item (id) SELECT 0 FROM item;
-Query OK, 524288 rows affected (5.07 sec)
-Records: 524288  Duplicates: 0  Warnings: 0
+CREATE TABLE item
+(
+    id   INT PRIMARY KEY AUTO_INCREMENT,
+    num  INT UNSIGNED,
+    str  VARCHAR(30),
+    str2 VARCHAR(30),
+    str3 VARCHAR(30)
+);
 ```
 
-### インデックスあり
+#### index あり
 ```
-mysql> INSERT INTO item_index (id) SELECT 0 FROM item_index;
-Query OK, 524288 rows affected (7.73 sec)
-Records: 524288  Duplicates: 0  Warnings: 0
+CREATE TABLE item_index
+(
+    id   INT PRIMARY KEY AUTO_INCREMENT,
+    num  INT UNSIGNED,
+    str  VARCHAR(30),
+    str2 VARCHAR(30),
+    str3 VARCHAR(30),
+    index (num),
+    index (str)
+);
 ```
 
-### 無駄にインデックスあり
+#### 無駄に index あり
 ```
-mysql> INSERT INTO item_index_2 (id) SELECT 0 FROM item_index_2;
-Query OK, 524288 rows affected (19.93 sec)
-Records: 524288  Duplicates: 0  Warnings: 0
+CREATE TABLE item_index_2
+(
+id   INT PRIMARY KEY AUTO_INCREMENT,
+num  INT UNSIGNED,
+str  VARCHAR(30),
+str2 VARCHAR(30),
+str3 VARCHAR(30),
+index (num),
+index (str),
+index (str2),
+index (str3),
+index (str, str2),
+index (str, str3),
+index (str2, str3),
+index (str, str2, str3),
+index (str, str3, str2),
+index (str2, str, str3),
+index (str2, str3, str),
+index (str3, str2, str)
+);
 ```
+
+### 結果
+![](images/2.png)
+![](images/1.png)
+![](images/3.png)
+
 
 ## 100万 全レコード UPDATE
 ### インデックスなし
