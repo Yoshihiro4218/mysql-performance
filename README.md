@@ -2,6 +2,10 @@
 普段パフォーマンスを気にしながらインデックスを貼ったりクエリを投げているわけですが、無頓着だとどれくらい差がでるのか気になったので計測してみます。
 
 # 計測
+## 計測方法
+- 単純に `Query OK, xxx rows affected (x min x.xx sec)` の時間を見ています
+- ただ、時間が短くシビアなものについては `performance_schema` スキーマを確認しています
+
 ## INSERT
 ### テーブル
 #### index なし
@@ -61,6 +65,8 @@ index (str3, str2, str)
 
 
 ## 100万 全レコード UPDATE
+同じテーブルに対して UPDATE かけました。
+
 ### インデックスなし
 ```
 mysql> UPDATE item
