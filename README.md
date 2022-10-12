@@ -64,44 +64,11 @@ index (str3, str2, str)
 ![](images/3.png)
 
 
-## 100万 全レコード UPDATE
-同じテーブルに対して UPDATE かけました。
+## UPDATE
+- 同じテーブルに対して UPDATE かけました。
+- テストデータの id が綺麗じゃなかったので LIMIT を使って UPDATE 件数を指定しています(ので、通常よりパフォーマンスは落ちていると思われます)
 
-### インデックスなし
-```
-mysql> UPDATE item
-    -> SET num  = CEIL(RAND() * 100000000),
-    ->     str  = SUBSTRING(MD5(RAND()), 1, 30),
-    ->     str2 = SUBSTRING(MD5(RAND()), 1, 30),
-    ->     str3 = SUBSTRING(MD5(RAND()), 1, 30);
-
-Query OK, 1048576 rows affected (22.64 sec)
-Rows matched: 1048576  Changed: 1048576  Warnings: 0
-```
-
-### インデックスあり
-```
-mysql> UPDATE item_index
-    -> SET num  = CEIL(RAND() * 100000000),
-    ->     str  = SUBSTRING(MD5(RAND()), 1, 30),
-    ->     str2 = SUBSTRING(MD5(RAND()), 1, 30),
-    ->     str3 = SUBSTRING(MD5(RAND()), 1, 30);
-
-Query OK, 1048576 rows affected (2 min 2.74 sec)
-Rows matched: 1048576  Changed: 1048576  Warnings: 0
-```
-
-### 無駄にインデックスあり
-```
-mysql> UPDATE item_index_2
-    -> SET num  = CEIL(RAND() * 100000000),
-    ->     str  = SUBSTRING(MD5(RAND()), 1, 30),
-    ->     str2 = SUBSTRING(MD5(RAND()), 1, 30),
-    ->     str3 = SUBSTRING(MD5(RAND()), 1, 30);
-
-Query OK, 1048576 rows affected (30 min 19.58 sec)
-Rows matched: 1048576  Changed: 1048576  Warnings: 0
-```
+### 結果
 
 
 

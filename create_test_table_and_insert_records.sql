@@ -129,4 +129,5 @@ UPDATE item_index_2
 SET num  = CEIL(RAND() * 100000000),
     str  = SUBSTRING(MD5(RAND()), 1, 30),
     str2 = SUBSTRING(MD5(RAND()), 1, 30),
-    str3 = SUBSTRING(MD5(RAND()), 1, 30);
+    str3 = SUBSTRING(MD5(RAND()), 1, 30)
+LIMIT 50;
