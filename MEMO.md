@@ -607,7 +607,7 @@ mysql> SELECT EVENT_ID,                                                         
 ```
 
 ## 絞り込みのタイミング(後方一致でやりなおし)
-### 1条件目で絞り込めてない
+### 1条件目で絞り込めていない
 ```
 mysql> SELECT EVENT_ID,
     ->        TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
