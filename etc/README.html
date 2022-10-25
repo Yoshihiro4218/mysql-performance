@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="mysql-%E3%81%A7%E3%81%AE%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E6%B8%AC%E5%AE%9A">MySQL でのパフォーマンス測定</h1>
+<ul>
+<li>普段パフォーマンスを気にしながらインデックスを貼ったりクエリを投げているわけですが、無頓着だとどれくらい差がでるのか気になったので計測してみます</li>
+<li>実務のデータ数でこれまで体感できなかった為、実際に差が出るのか？を試してみたかったというのが経緯です</li>
+</ul>
+<h1 id="%E8%A8%88%E6%B8%AC">計測</h1>
+<h2 id="%E8%A8%88%E6%B8%AC%E6%96%B9%E6%B3%95">計測方法</h2>
+<ul>
+<li>単純に <code>Query OK, xxx rows affected (x min x.xx sec)</code> の時間を見ています</li>
+<li>ただ、時間が短くシビアなものについては <code>performance_schema</code> database を確認しています</li>
+</ul>
+<h2 id="insert">INSERT</h2>
+<h3 id="%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB">テーブル</h3>
+<h4 id="index-%E3%81%AA%E3%81%97">index なし</h4>
+<pre class="hljs"><code><div>CREATE TABLE item
+(
+    id   INT PRIMARY KEY AUTO_INCREMENT,
+    num  INT UNSIGNED,
+    str  VARCHAR(30),
+    str2 VARCHAR(30),
+    str3 VARCHAR(30)
+);
+</div></code></pre>
+<h4 id="index-%E3%81%82%E3%82%8A">index あり</h4>
+<pre class="hljs"><code><div>CREATE TABLE item_index
+(
+    id   INT PRIMARY KEY AUTO_INCREMENT,
+    num  INT UNSIGNED,
+    str  VARCHAR(30),
+    str2 VARCHAR(30),
+    str3 VARCHAR(30),
+    index (num),
+    index (str)
+);
+</div></code></pre>
+<h4 id="%E7%84%A1%E9%A7%84%E3%81%AB-index-%E3%81%82%E3%82%8A">無駄に index あり</h4>
+<pre class="hljs"><code><div>CREATE TABLE item_index_2
+(
+id   INT PRIMARY KEY AUTO_INCREMENT,
+num  INT UNSIGNED,
+str  VARCHAR(30),
+str2 VARCHAR(30),
+str3 VARCHAR(30),
+index (num),
+index (str),
+index (str2),
+index (str3),
+index (str, str2),
+index (str, str3),
+index (str2, str3),
+index (str, str2, str3),
+index (str, str3, str2),
+index (str2, str, str3),
+index (str2, str3, str),
+index (str3, str2, str)
+);
+</div></code></pre>
+<h3 id="%E7%B5%90%E6%9E%9C">結果</h3>
+<p><img src="../images/2.png" alt="">
+<img src="../images/1.png" alt="">
+<img src="../images/3.png" alt=""></p>
+<h2 id="update">UPDATE</h2>
+<ul>
+<li>同じテーブルに対して UPDATE かけました。</li>
+<li>テストデータの id が綺麗じゃなかったので LIMIT を使って UPDATE 件数を指定しています(通常よりパフォーマンスは落ちていると思われます)</li>
+</ul>
+<h3 id="%E7%B5%90%E6%9E%9C">結果</h3>
+<p><img src="../images/4.png" alt="">
+<img src="../images/5.png" alt="">
+<img src="../images/6.png" alt=""></p>
+<h2 id="%E7%B5%9E%E3%82%8A%E8%BE%BC%E3%82%80%E3%82%BF%E3%82%A4%E3%83%9F%E3%83%B3%E3%82%B0%E3%81%8C%E6%97%A9%E3%81%84%E6%99%82%E3%81%A8%E9%81%85%E3%81%84%E6%99%82">絞り込むタイミングが早い時と遅い時</h2>
+<h3 id="1%E6%9D%A1%E4%BB%B6%E7%9B%AE%E3%81%A7%E3%81%82%E3%81%BE%E3%82%8A%E7%B5%9E%E3%82%8A%E8%BE%BC%E3%82%81%E3%81%A6%E3%81%84%E3%81%AA%E3%81%84%E5%A0%B4%E5%90%88">1条件目であまり絞り込めていない場合</h3>
+<pre class="hljs"><code><div>mysql&gt; SELECT EVENT_ID,
+    -&gt;        TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
+    -&gt;        SQL_TEXT
+    -&gt; FROM performance_schema.events_statements_history_long
+    -&gt; WHERE SQL_TEXT = &quot;select * from item where str like '%2%' and str2 like '%525%'&quot;;
++----------+----------+---------------------------------------------------------------+
+| EVENT_ID | Duration | SQL_TEXT                                                      |
++----------+----------+---------------------------------------------------------------+
+|      532 | 0.758868 | select * from item where str like '%2%' and str2 like '%525%' |
+|      627 | 0.734291 | select * from item where str like '%2%' and str2 like '%525%' |
+|      646 | 0.731736 | select * from item where str like '%2%' and str2 like '%525%' |
+|      665 | 0.784295 | select * from item where str like '%2%' and str2 like '%525%' |
+|      684 | 0.699200 | select * from item where str like '%2%' and str2 like '%525%' |
+|      817 | 0.726403 | select * from item where str like '%2%' and str2 like '%525%' |
+|      836 | 0.665074 | select * from item where str like '%2%' and str2 like '%525%' |
+|      855 | 0.669399 | select * from item where str like '%2%' and str2 like '%525%' |
+|      874 | 0.718087 | select * from item where str like '%2%' and str2 like '%525%' |
+|      893 | 0.731762 | select * from item where str like '%2%' and str2 like '%525%' |
++----------+----------+---------------------------------------------------------------+
+10 rows in set (0.00 sec)
+</div></code></pre>
+<p>→ 平均 <code>0.7219115s</code></p>
+<h3 id="1%E6%9D%A1%E4%BB%B6%E7%9B%AE%E3%81%A7%E7%B5%9E%E3%82%8A%E8%BE%BC%E3%82%81%E3%81%A6%E3%81%84%E3%82%8B%E5%A0%B4%E5%90%88%E4%B8%8A%E8%A8%98%E3%81%A8-where-%E3%81%AE%E9%A0%86%E7%95%AA%E3%82%92%E9%80%86%E3%81%AB%E3%81%97%E3%81%9F">1条件目で絞り込めている場合(上記と where の順番を逆にした)</h3>
+<pre class="hljs"><code><div>mysql&gt; SELECT EVENT_ID,
+    -&gt;        TRUNCATE(TIMER_WAIT / 1000000000000, 6) AS Duration,
+    -&gt;        SQL_TEXT
+    -&gt; FROM performance_schema.events_statements_history_long
+    -&gt; WHERE SQL_TEXT = &quot;select * from item where str2 like '%525%' and str like '%2%'&quot;;
++----------+----------+---------------------------------------------------------------+
+| EVENT_ID | Duration | SQL_TEXT                                                      |
++----------+----------+---------------------------------------------------------------+
+|      551 | 0.610941 | select * from item where str2 like '%525%' and str like '%2%' |
+|      570 | 0.568627 | select * from item where str2 like '%525%' and str like '%2%' |
+|      589 | 0.619817 | select * from item where str2 like '%525%' and str like '%2%' |
+|      608 | 0.630084 | select * from item where str2 like '%525%' and str like '%2%' |
+|      703 | 0.627935 | select * from item where str2 like '%525%' and str like '%2%' |
+|      722 | 0.613024 | select * from item where str2 like '%525%' and str like '%2%' |
+|      741 | 0.563686 | select * from item where str2 like '%525%' and str like '%2%' |
+|      760 | 0.567389 | select * from item where str2 like '%525%' and str like '%2%' |
+|      779 | 0.595388 | select * from item where str2 like '%525%' and str like '%2%' |
+|      798 | 0.675684 | select * from item where str2 like '%525%' and str like '%2%' |
++----------+----------+---------------------------------------------------------------+
+10 rows in set (0.01 sec)
+</div></code></pre>
+<p>→ 平均 <code>0.6072575s</code></p>
+<p>→このケースでは <code>15%</code> 程度パフォーマンスが改善</p>
+<h2 id="%E5%A4%B1%E6%95%97%E3%81%97%E3%81%BE%E3%81%97%E3%81%9F-%E5%AD%A6%E3%81%B3">失敗しました (学び)</h2>
+<p><code>後からインデックスを貼ったとき</code> の時間を計測したかったわけだが、100万レコードから DELETE でレコードを減らしながら計測していったが、なぜか結果が以下のように。</p>
+<p><img src="../images/7.png" alt="">
+<img src="../images/8.png" alt=""></p>
+<p>比例しないものなんですかね？<br>
+不審に思い試しに6レコードしかない状態ですが <code>SELECT * FROM item;</code> をやってみると...</p>
+<pre class="hljs"><code><div>mysql&gt; select * from  item;
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+| id      | num      | str                            | str2                           | str3                           |
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+| 1310688 | 98135764 | 6bff0ca187f6a99c99daf21799282a | 4187a80d597ac9855519b8c1d90c2e | b40a8a182d9b7d67e0e3062ead701d |
+| 1310689 | 10926723 | 01b18c93949530fe2e7d870f8aca24 | f80b962ec99c28c1d7a37c5af31786 | 4f80cc563c4e6ca7842692629b744f |
+| 1310690 | 98869803 | 145d8de154d23367713cbdca066f7f | b77d25c46f0ad94b398c16614e4f75 | a1b28b4e59ffea131727eec6834281 |
+| 1310691 | 27278484 | 80ac1361cbe1abd80bb31cdbf5e525 | 2ac1774a89828415501144a148c088 | e1ef45687fa3c80eed91e9363612a1 |
+| 1310692 | 48066717 | d86bd1608477460813a76884f0456a | f6940106536b08dd3bf035ed769a4e | 507d17133d4913b2cc5b8f604bc9d9 |
+| 1310693 | 77327447 | a130de047f9183a922cc3bc3f9fc26 | 0873044106d59a9b9fa89d712b0e09 | 4eb3b32e3845385b3054d8e92e4c4b |
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+6 rows in set (32.40 sec)
+</div></code></pre>
+<pre class="hljs"><code><div>＿人人人人人人人人人人人人人人人人人＿
+＞ 6 rows in set (32.40 sec)   ＜
+￣Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y￣
+</div></code></pre>
+<h3 id="%E7%89%A9%E7%90%86%E5%89%8A%E9%99%A4%E3%82%92%E3%81%97%E7%B6%9A%E3%81%91%E3%82%8B%E3%81%A8%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%81%8C%E6%82%AA%E3%81%8F%E3%81%AA%E3%82%8B">物理削除をし続けるとパフォーマンスが悪くなる</h3>
+<p>MySQL の InnoDB では、フラグメンテーション(断片化) が起こるとのこと。言われてみると、そうなるのが自然な気がしますね...<br>
+断片化のせいでパフォーマンスが極端に悪化していたものと推測。<br>
+<code>ALTER TABLE テーブル名 ENGINE INNODB;</code> で最適化できるとのことなのでやってみると、</p>
+<pre class="hljs"><code><div>mysql&gt; select * from  item;
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+| id      | num      | str                            | str2                           | str3                           |
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+| 1310688 | 98135764 | 6bff0ca187f6a99c99daf21799282a | 4187a80d597ac9855519b8c1d90c2e | b40a8a182d9b7d67e0e3062ead701d |
+| 1310689 | 10926723 | 01b18c93949530fe2e7d870f8aca24 | f80b962ec99c28c1d7a37c5af31786 | 4f80cc563c4e6ca7842692629b744f |
+| 1310690 | 98869803 | 145d8de154d23367713cbdca066f7f | b77d25c46f0ad94b398c16614e4f75 | a1b28b4e59ffea131727eec6834281 |
+| 1310691 | 27278484 | 80ac1361cbe1abd80bb31cdbf5e525 | 2ac1774a89828415501144a148c088 | e1ef45687fa3c80eed91e9363612a1 |
+| 1310692 | 48066717 | d86bd1608477460813a76884f0456a | f6940106536b08dd3bf035ed769a4e | 507d17133d4913b2cc5b8f604bc9d9 |
+| 1310693 | 77327447 | a130de047f9183a922cc3bc3f9fc26 | 0873044106d59a9b9fa89d712b0e09 | 4eb3b32e3845385b3054d8e92e4c4b |
++---------+----------+--------------------------------+--------------------------------+--------------------------------+
+6 rows in set (0.00 sec)
+</div></code></pre>
+<p>無事復活しました。</p>
+<p>パーティションとか、他にも色々やりたかったのですが今回はやりきれませんでした。<br>
+また機会があればやろうとおもいます。</p>
+
+</body>
+</html>
