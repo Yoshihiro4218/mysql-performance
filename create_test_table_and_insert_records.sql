@@ -131,3 +131,8 @@ SET num  = CEIL(RAND() * 100000000),
     str2 = SUBSTRING(MD5(RAND()), 1, 30),
     str3 = SUBSTRING(MD5(RAND()), 1, 30)
 LIMIT 50;
+
+
+
+ALTER TABLE item ADD INDEX test(num);
+

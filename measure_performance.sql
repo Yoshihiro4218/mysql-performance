@@ -39,3 +39,10 @@ FROM performance_schema.events_statements_history_long
 WHERE SQL_TEXT = "select * from item where str2 like '%525%' and str like '%2%'";
 
 
+SELECT table_schema, table_name, data_free, table_rows
+FROM information_schema.tables
+WHERE table_schema = 'performance';
+
+
+
+
